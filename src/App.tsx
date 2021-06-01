@@ -1,25 +1,32 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import 'normalize.css'
+import styled from 'styled-components'
+import WebFont from 'webfontloader'
+import REMScaling from './util/remScaling'
+import HeaderBar from './components/HeaderBar'
+
+const StyledPageWrapper = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  font-family: 'Montserrat';
+`
 
 function App() {
+
+  React.useEffect(() => {
+    WebFont.load({
+      google: {
+        families: ['Montserrat']
+      }
+    });
+  }, [])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <REMScaling>
+      <StyledPageWrapper>
+        <HeaderBar />
+      </StyledPageWrapper>
+    </REMScaling>
   );
 }
 
