@@ -39,7 +39,7 @@ interface State {
 }
 
 const initialState: State = {
-    searchTerm: "Star Wars",
+    searchTerm: "Star wars",
     yearRange: {
         start: 1970,
         end: 2015,
