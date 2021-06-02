@@ -82,6 +82,10 @@ const StyledRadioButton = styled.input`
     }
 `
 
+const FixedWidthSpan = styled.span`
+    width: 2rem;
+`
+
 const FilterBar = (): JSX.Element => {
 
     const initialState = store.getState()
@@ -100,8 +104,9 @@ const FilterBar = (): JSX.Element => {
             <StyledFormField>
                 <StyledLabel>YEAR</StyledLabel>
                 <StyledRangeWrapper>
-                    {state.yearRange.start}
+                    <FixedWidthSpan>{state.yearRange.start}</FixedWidthSpan>
                     <Slider
+                        disabled={state.isFetching}
                         domain={[minYear, currentYear]}
                         values={[state.yearRange.start, state.yearRange.end]}
                         step={1}
@@ -163,31 +168,30 @@ const FilterBar = (): JSX.Element => {
                             }}
                         </Tracks>
                     </Slider>
-                    {state.yearRange.end}
+                    <FixedWidthSpan>{state.yearRange.end}</FixedWidthSpan>
                 </StyledRangeWrapper>
-                
             </StyledFormField>
             <StyledFormField>
                 <StyledLabel>TYPE</StyledLabel>
                 <RadioWrapper>
-                    <StyledSpan><StyledRadioButton type="radio" checked={state.type === 'Any'} onChange={(changeEvent) => {
+                    <StyledSpan><StyledRadioButton disabled={state.isFetching} type="radio" checked={state.type === 'Any'} onChange={(changeEvent) => {
                         if (changeEvent.target.checked) {
                             store.dispatch({type: 'updateType', newType: 'Any'})
                         }
                     }}/> Any</StyledSpan>
-                    <StyledSpan><StyledRadioButton type="radio" checked={state.type === 'Movies'} onChange={(changeEvent) => {
+                    <StyledSpan><StyledRadioButton disabled={state.isFetching} type="radio" checked={state.type === 'Movie'} onChange={(changeEvent) => {
                         if (changeEvent.target.checked) {
-                            store.dispatch({type: 'updateType', newType: 'Movies'})
+                            store.dispatch({type: 'updateType', newType: 'Movie'})
                         }
                     }}/> Movies</StyledSpan>
-                    <StyledSpan><StyledRadioButton type="radio" checked={state.type === 'Series'} onChange={(changeEvent) => {
+                    <StyledSpan><StyledRadioButton disabled={state.isFetching} type="radio" checked={state.type === 'Series'} onChange={(changeEvent) => {
                         if (changeEvent.target.checked) {
                             store.dispatch({type: 'updateType', newType: 'Series'})
                         }
                     }}/> Series</StyledSpan>
-                    <StyledSpan><StyledRadioButton type="radio" checked={state.type === 'Episodes'} onChange={(changeEvent) => {
+                    <StyledSpan><StyledRadioButton disabled={state.isFetching} type="radio" checked={state.type === 'Episode'} onChange={(changeEvent) => {
                         if (changeEvent.target.checked) {
-                            store.dispatch({type: 'updateType', newType: 'Episodes'})
+                            store.dispatch({type: 'updateType', newType: 'Episode'})
                         }
                     }}/> Episodes</StyledSpan>
                 </RadioWrapper>

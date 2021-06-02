@@ -3,6 +3,7 @@ import store from '../util/reduxStore'
 import React from 'react'
 import FilterBar from './FilterBar'
 import { ReactComponent as SearchSVG } from '../search-solid.svg'
+import { fetchTitles, OMDBData } from '../util/omdb'
 
 const StyledHeaderWrapper = styled.div`
     display: flex;
@@ -64,13 +65,51 @@ const HeaderBar = (): JSX.Element => {
         setState(store.getState())
     })
 
+    const inputRef = React.useRef<HTMLInputElement>(null)
+
     return (
         <StyledHeaderWrapper>
             <StyledSVG />
             <StyledInputField
+                ref={inputRef}
                 value={state.searchTerm}
+                disabled={state.isFetching}
                 onChange={(changeEvent) => {
-                    store.dispatch({type: 'updateTerm', newTerm: changeEvent.target.value})
+                    store.dispatch({
+                        type: 'updateTerm',
+                        newTerm: changeEvent.target.value,
+                        apiResult: state.apiResult,
+                        isFetching: state.isFetching
+                    })
+                }}
+                onKeyDown={(keyEvent) => {
+                    if (keyEvent?.nativeEvent?.key === 'Enter') {
+                        // set the state as fetching to disable other input until complete
+                        store.dispatch({
+                            type: 'updateTerm',
+                            newTerm: inputRef?.current?.value ? inputRef.current.value : '',
+                            apiResult: undefined,
+                            isFetching: true
+                        })
+                        // Atempt to fetch the matching titles
+                        fetchTitles(keyEvent.currentTarget.value).then((results) => {
+                            const { resultArray } = results as OMDBData
+                            store.dispatch({
+                                type: 'updateTerm',
+                                newTerm: inputRef?.current?.value ? inputRef.current.value : '',
+                                apiResult: resultArray,
+                                isFetching: false
+                            })
+                        }).catch((err) => {
+                            console.log(err)
+                            store.dispatch({
+                                type: 'updateTerm',
+                                newTerm: inputRef?.current?.value ? inputRef.current.value : '',
+                                apiResult: undefined,
+                                isFetching: false
+                            })
+                        })
+                    }
                 }}
             />
             <StyledFormWrapper>

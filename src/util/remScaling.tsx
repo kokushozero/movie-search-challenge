@@ -9,7 +9,7 @@ const REMScaler: React.FC = ({ children }): JSX.Element => {
     const calculateRootFont = () => {
         const isDesktop = window.innerWidth > MOBILETARGETWIDTH
         const delta = window.innerWidth / (isDesktop ? DESKTOPTARGETWIDTH : MOBILETARGETWIDTH)
-        return isDesktop ? delta * BASEFONTSIZE : delta * BASEFONTSIZE * 1.5
+        return isDesktop ? delta * BASEFONTSIZE : delta * BASEFONTSIZE
     }
 
     React.useEffect(() => {
