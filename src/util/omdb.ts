@@ -1,3 +1,5 @@
+import store from './reduxStore'
+
 export type Ratings = {
     Source: string,
     Value: string
@@ -65,7 +67,14 @@ export const fetchTitles = async (searchTerm: string) => {
                     } else {
                         shouldContinue = true
                     }
+                } else{
+                    shouldContinue = false
                 }
+                store.dispatch({
+                    type: "updateFetchCount",
+                    toFetch: totalResults - resultArray.length,
+                    fetchCount: resultArray.length
+                })
                 page++
             })
             .catch((error) => {
@@ -73,6 +82,13 @@ export const fetchTitles = async (searchTerm: string) => {
                 shouldContinue = false
             })
         } while (shouldContinue)
+
+        store.dispatch({
+            type: "updateFetchCount",
+            toFetch: undefined,
+            fetchCount: undefined
+        })
+
         /*eslint-enable */
         res({
             resultArray: resultArray,

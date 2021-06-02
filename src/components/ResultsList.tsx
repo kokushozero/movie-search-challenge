@@ -20,7 +20,7 @@ const StyledP = styled.p`
     text-transform: uppercase;
     font-weight: 600;
     margin-left: 1rem;
-    
+
     @media (min-width: 1025px) {
         flex-basis: 40%;
         padding: 1.5rem;
@@ -103,7 +103,12 @@ const ResultsList = (): JSX.Element => {
 
     const getTopLabel = () => {
         if (state.isFetching) {
-            return <StyledP>Fetching results, please wait...</StyledP>
+            return <>
+                <StyledP>Fetching results, please wait...</StyledP>
+                {state.fetch ? (
+                    <StyledP>{state.fetch.fetchCount} fetched, {state.fetch.toFetch} remaining</StyledP>
+                ) : null}
+            </>
         }
         if (state?.filteredResult?.length) {
             return <StyledP>{state.filteredResult.length} Results</StyledP>

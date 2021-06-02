@@ -30,7 +30,13 @@ export interface UpdateActive {
     activeResultLoading: boolean,
 }
 
-type Action = UpdateTerm | UpdateRange | UpdateType | UpdateActive
+export interface UpdateFetchCount {
+    type: 'updateFetchCount',
+    toFetch?: number,
+    fetchCount?: number,
+}
+
+type Action = UpdateTerm | UpdateRange | UpdateType | UpdateActive | UpdateFetchCount
 
 interface State {
     searchTerm: string,
@@ -44,6 +50,10 @@ interface State {
     activeResult?: OMDBMediaItem,
     activeResultLoading: boolean,
     isFetching: boolean,
+    fetch: {
+        toFetch?: number,
+        fetchCount?: number
+    } | undefined,
 }
 
 const filterApiResults = (apiResult: OMDBListItem[] | undefined, state: State): OMDBListItem[] | undefined => {
@@ -88,13 +98,14 @@ const initialState: State = {
     filteredResult: undefined,
     activeResult: prefetchedActiveResult,
     activeResultLoading: false,
-    isFetching: false
+    isFetching: false,
+    fetch: undefined
 }
 
 initialState.filteredResult = filterApiResults(prefetchedApiResult, initialState)
 
 const reducer = (state = initialState, action: Action) => {
-    let updatedState
+    let updatedState: State
     switch(action.type) {
         case 'updateTerm':
             updatedState = { ...state, searchTerm: action.newTerm, apiResult: action.apiResult, isFetching: action.isFetching}
@@ -103,16 +114,36 @@ const reducer = (state = initialState, action: Action) => {
             return updatedState
         case 'updateRange':
             updatedState = { ...state, yearRange: action.newRange}
-            updatedState.activeResult = undefined
             updatedState.filteredResult = filterApiResults(updatedState.apiResult, updatedState)
+
+            // If the currently shown title is no longer in the filtered list, we demount it from the media detail component
+            if (!updatedState?.activeResult || !updatedState.filteredResult?.find((media) => {
+                return media.imdbID === updatedState.activeResult?.imdbID
+            })) {
+                updatedState.activeResult = undefined
+            }
             return updatedState
         case 'updateType':
             updatedState = { ...state, type: action.newType}
-            updatedState.activeResult = undefined
             updatedState.filteredResult = filterApiResults(updatedState.apiResult, updatedState)
+
+            // If the currently shown title is no longer in the filtered list, we demount it from the media detail component
+            if (!updatedState?.activeResult || !updatedState.filteredResult?.find((media) => {
+                return media.imdbID === updatedState.activeResult?.imdbID
+            })) {
+                updatedState.activeResult = undefined
+            }
             return updatedState
         case 'updateActive':
             updatedState = { ...state, activeResult: action.selectedMedia, activeResultLoading: action.activeResultLoading}
+            return updatedState
+        case 'updateFetchCount':
+            const { toFetch, fetchCount } = action
+            const fetch = toFetch && fetchCount ? {
+                toFetch: toFetch,
+                fetchCount: fetchCount
+            } : undefined
+            updatedState = { ...state, fetch: fetch}
             return updatedState
         default:
             return state
