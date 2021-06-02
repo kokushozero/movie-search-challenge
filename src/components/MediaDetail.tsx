@@ -1,6 +1,8 @@
 import styled from 'styled-components'
 import store from '../util/reduxStore'
 import React from 'react'
+import { ReactComponent as BookmarkSVG } from '../bookmark-solid.svg'
+import Dexie from 'dexie'
 
 interface StyledWrapperProps {
     activeResultLoading: boolean
@@ -193,7 +195,57 @@ const StyledRatingInfo = styled.div`
     }
 `
 
+const WatchlistButton = styled.button`
+    display: flex;
+    position: absolute;
+    right: 10%;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-radius: 7px;
+    background: white;
+    cursor: pointer;
+    font-weight: 600;
+    top: 20rem;
+    transform: translate(-50%, -100%);
+
+    @media (min-width: 1025px) {
+        right: 10%;
+        top: auto;
+        transform: none;
+    }
+
+    svg {
+        height: 1rem;
+        width: 1rem;
+        margin-right: 1rem;
+    }
+`
+
+interface Wishlist {
+    id?: number,
+    imdbID: string,
+}
+
+class WishlistDatabase extends Dexie {
+    public wishlist: Dexie.Table<Wishlist>
+
+    public constructor() {
+        super("WishlistDatabase")
+        this.version(1).stores({
+            wishlist: "++id,imdbID"
+        })
+        this.wishlist = this.table("wishlist")
+    }
+}
+
+const db = new WishlistDatabase()
+
 const MediaDetail = (): JSX.Element => {
+
+    const [wishlistState, setWishlistState] = React.useState({
+        loading: true,
+        isOnWishlist: false,
+    })
 
     const initialState = store.getState()
     const [state, setState] = React.useState(initialState)
@@ -202,6 +254,51 @@ const MediaDetail = (): JSX.Element => {
         setState(store.getState())
     })
 
+    // as component first loads we checked the indexed db to see if it is on our wishlist
+    React.useEffect(() => {
+        if (state.activeResult?.imdbID) {
+            db.transaction('r', db.wishlist, async() => {
+                const exists = await db.wishlist.where({imdbID: state.activeResult?.imdbID}).count()
+                setWishlistState({
+                    loading: false,
+                    isOnWishlist: exists > 0
+                })
+            })
+        }
+    }, [state])
+
+    const toggleWishlistState = () => {
+        if (state.activeResult && state.activeResult?.imdbID) {
+            setWishlistState({
+                loading: true,
+                isOnWishlist: wishlistState.isOnWishlist
+            })
+            const isOnWishlist = wishlistState.isOnWishlist
+            db.transaction('rw', db.wishlist, async() => {
+                if (state?.activeResult?.imdbID) {
+                    const exists = await db.wishlist.where({imdbID: state.activeResult?.imdbID}).count()
+                    if (isOnWishlist) {
+                        // remove from wishlist
+                        if (exists > 0) {
+                            await db.wishlist.where({imdbID: state.activeResult?.imdbID}).delete()
+                        }
+                    } else {
+                        // add to wishlist
+                        if (!exists) {
+                            await db.wishlist.add({
+                                imdbID: state.activeResult.imdbID
+                            })
+                        }
+                    }
+                    setWishlistState({
+                        loading: false,
+                        isOnWishlist: !isOnWishlist
+                    })
+                }
+            })
+        }
+    }
+
     return (
         <StyledWrapper activeResultLoading={state.activeResultLoading}>
             <StyledLoadingDialog activeResultLoading={state.activeResultLoading}>
@@ -209,6 +306,11 @@ const MediaDetail = (): JSX.Element => {
             </StyledLoadingDialog>
             {state.activeResult ? (
                 <StyledMediaMain>
+                    {!wishlistState.loading ? (
+                        <WatchlistButton onClick={() => toggleWishlistState()}><BookmarkSVG /> {wishlistState.isOnWishlist ? 'Remove' : 'Wishlist'}</WatchlistButton>
+                    ) : (
+                        <WatchlistButton>Loading</WatchlistButton>
+                    )}
                     <StyledPoster posterUrl={state.activeResult.Poster !== 'N/A' ? state.activeResult.Poster : 'https://via.placeholder.com/355x508.png?text=No+Poster'} />
                     <StyledMainContent>
                         <StyledH2>{state.activeResult.Title}</StyledH2>
@@ -227,7 +329,7 @@ const MediaDetail = (): JSX.Element => {
                     </PlotWrapper>
                     <RatingsWrapper>
                         {state.activeResult.Ratings?.map(rating => (
-                        <StyledRatingInfo>
+                        <StyledRatingInfo key={rating.Source}>
                             <span>{rating?.Value}</span>
                             <span>{rating?.Source}</span>
                         </StyledRatingInfo>)

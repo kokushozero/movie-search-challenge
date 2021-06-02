@@ -1,10 +1,22 @@
-# Getting Started with Create React App
+# Movie Series Search Frontend Challenge
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Searches the [OMDB](https://omdbapi.com/) for your supplied search string, then filters the results based on your chosen filter constraints.
 
-## Available Scripts
+The redux state is pre-hydrated with sample data on first load, however the api connection to OMDB is fully functional and can be used to search
+for any content. 
 
-In the project directory, you can run:
+Because the OMDB doesn't allow search based on year range, all years are initially sourced and then filtered out in the client. If you search for a popular
+term, this may result in dozens of api calls in order to fetch all the content to then filter.
+
+## BEFORE YOU RUN
+
+This project uses the build tool yarn, you can install it by running the command
+`npm install --global yarn`
+
+This project utilises the OMDB api which requires a free api key to access. Please insert your key into the .env.example file and rename
+the file to .env otherwise you will be unable to connect to the third party data source.
+
+## The following scripts are available to you
 
 ### `yarn start`
 
@@ -13,11 +25,6 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 The page will reload if you make edits.\
 You will also see any lint errors in the console.
-
-### `yarn test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
 ### `yarn build`
 
@@ -38,9 +45,3 @@ If you aren’t satisfied with the build tool and configuration choices, you can
 Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
 
 You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).

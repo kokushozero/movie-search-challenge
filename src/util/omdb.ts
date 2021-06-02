@@ -35,17 +35,17 @@ const PERPAGE = 10 // OMDB's set value, not configurable
 export const fetchTitles = async (searchTerm: string) => {
 
     if (!process.env.REACT_APP_OMDB_API_KEY) {
-        throw 'Required env var not set for OMDB API lookup'
+        throw Error('Required env var not set for OMDB API lookup')
     }
 
     let resultArray: OMDBListItem[] = []
     let totalResults: number
-
+    let shouldContinue: boolean
     // We need to exhaust the api's paginated results in order to filter by year
     // We'll request all pages of a result and filter them on the front end
+    /*eslint-disable */
     return new Promise(async (res) => {
         let page = 1
-        let shouldContinue
         do {
             await fetch(`http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDB_API_KEY}&s=${searchTerm}&page=${page}`)
             .then(response => {
@@ -73,6 +73,7 @@ export const fetchTitles = async (searchTerm: string) => {
                 shouldContinue = false
             })
         } while (shouldContinue)
+        /*eslint-enable */
         res({
             resultArray: resultArray,
             totalResults: totalResults,
@@ -83,13 +84,13 @@ export const fetchTitles = async (searchTerm: string) => {
 export const fetchTitleDetail = async (imdbID: string): Promise<OMDBMediaItem | undefined> => {
 
     if (!process.env.REACT_APP_OMDB_API_KEY) {
-        throw 'Required env var not set for OMDB API lookup'
+        throw Error('Required env var not set for OMDB API lookup')
     }
 
     return fetch(`http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDB_API_KEY}&i=${imdbID}`)
     .then(response => {
         if (!response.ok) {
-            throw "Response from fetch was not ok response"
+            throw Error("Response from fetch was not ok response")
         }
         return response.json()
     })

@@ -12,6 +12,7 @@
     "@types/react-dom": "^17.0.0",
     "@types/styled-components": "^5.1.9",
     "@types/webfontloader": "^1.6.32",
+    "dexie": "^3.0.3",
     "normalize.css": "^8.0.1",
     "react": "^17.0.2",
     "react-compound-slider": "^3.3.1",
@@ -26,13 +27,11 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
-      "react-app",
-      "react-app/jest"
+      "react-app"
     ]
   },
   "browserslist": {
