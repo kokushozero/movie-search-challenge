@@ -47,7 +47,7 @@ export const fetchTitles = async (searchTerm: string) => {
     return new Promise(async (res) => {
         let page = 1
         do {
-            await fetch(`http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDB_API_KEY}&s=${searchTerm}&page=${page}`)
+            await fetch(`https://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDB_API_KEY}&s=${searchTerm}&page=${page}`)
             .then(response => {
                 if (!response.ok) {
                     shouldContinue = false
@@ -87,7 +87,7 @@ export const fetchTitleDetail = async (imdbID: string): Promise<OMDBMediaItem | 
         throw Error('Required env var not set for OMDB API lookup')
     }
 
-    return fetch(`http://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDB_API_KEY}&i=${imdbID}`)
+    return fetch(`https://www.omdbapi.com/?apikey=${process.env.REACT_APP_OMDB_API_KEY}&i=${imdbID}`)
     .then(response => {
         if (!response.ok) {
             throw Error("Response from fetch was not ok response")
